@@ -1,46 +1,40 @@
-"use client";
-
-import { useState } from "react";
+import { auth } from "@clerk/nextjs/server";
 import { format } from "date-fns";
-import { CalendarIcon, Dumbbell } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import { buttonVariants } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Dumbbell } from "lucide-react";
+import { getWorkoutsForDate } from "@/data/workouts";
+import { DatePicker } from "./_components/DatePicker";
+import type { WorkoutSet } from "@/db/schema";
 
-// Placeholder workout data — replace with real data fetching later
-const MOCK_WORKOUTS = [
-  {
-    id: "1",
-    name: "Squat",
-    sets: 4,
-    reps: 5,
-    weight: 120,
-  },
-  {
-    id: "2",
-    name: "Bench Press",
-    sets: 4,
-    reps: 8,
-    weight: 80,
-  },
-  {
-    id: "3",
-    name: "Deadlift",
-    sets: 3,
-    reps: 5,
-    weight: 160,
-  },
-];
+function formatSetsInfo(sets: WorkoutSet[]): string {
+  const workingSets = sets.filter((s) => !s.isWarmup);
+  const count = workingSets.length || sets.length;
 
-export default function DashboardPage() {
-  const [date, setDate] = useState<Date>(new Date());
-  const [open, setOpen] = useState(false);
+  if (workingSets.length === 0) return `${count} sets`;
 
-  const workouts = MOCK_WORKOUTS; // will be filtered by date when data layer is added
+  const first = workingSets[0];
+  const allSame = workingSets.every(
+    (s) => s.reps === first.reps && s.weightKg === first.weightKg
+  );
+
+  if (allSame && first.reps != null && first.weightKg != null) {
+    return `${count} × ${first.reps} @ ${first.weightKg} kg`;
+  }
+
+  return `${count} sets`;
+}
+
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ date?: string }>;
+}) {
+  const { userId } = await auth();
+  const { date: dateParam } = await searchParams;
+
+  const date = dateParam ? new Date(`${dateParam}T00:00:00`) : new Date();
+  const workouts = await getWorkoutsForDate(userId!, date);
+
+  const exercises = workouts.flatMap((w) => w.workoutExercises);
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
@@ -50,28 +44,7 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
             Dashboard
           </h1>
-
-          {/* Date Picker */}
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger
-              className={buttonVariants({ variant: "outline" }) + " gap-2"}
-            >
-              <CalendarIcon className="h-4 w-4 text-zinc-500" />
-              {format(date, "do MMM yyyy")}
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" side="bottom" align="end">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={(d) => {
-                  if (d) {
-                    setDate(d);
-                    setOpen(false);
-                  }
-                }}
-              />
-            </PopoverContent>
-          </Popover>
+          <DatePicker date={date} />
         </div>
 
         {/* Workouts section */}
@@ -80,7 +53,7 @@ export default function DashboardPage() {
             Workouts — {format(date, "do MMM yyyy")}
           </h2>
 
-          {workouts.length === 0 ? (
+          {exercises.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-200 py-16 text-center dark:border-zinc-800">
               <Dumbbell className="mb-3 h-8 w-8 text-zinc-300 dark:text-zinc-600" />
               <p className="text-sm text-zinc-400 dark:text-zinc-500">
@@ -89,19 +62,19 @@ export default function DashboardPage() {
             </div>
           ) : (
             <ul className="flex flex-col gap-3">
-              {workouts.map((workout) => (
+              {exercises.map((we) => (
                 <li
-                  key={workout.id}
+                  key={we.id}
                   className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-5 py-4 dark:border-zinc-800 dark:bg-zinc-900"
                 >
                   <div className="flex items-center gap-3">
                     <Dumbbell className="h-5 w-5 text-zinc-400 dark:text-zinc-500" />
                     <span className="font-medium text-zinc-900 dark:text-zinc-50">
-                      {workout.name}
+                      {we.exercise.name}
                     </span>
                   </div>
                   <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                    {workout.sets} × {workout.reps} @ {workout.weight} kg
+                    {formatSetsInfo(we.sets)}
                   </span>
                 </li>
               ))}
