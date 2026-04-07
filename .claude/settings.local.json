@@ -1,8 +1,13 @@
 {
-  "outputStyle": "default",
   "permissions": {
     "allow": [
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(psql:*)",
+      "Bash(npx tsx:*)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "neon"
+  ],
+  "outputStyle": "default"
 }
