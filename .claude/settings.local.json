@@ -3,7 +3,9 @@
     "allow": [
       "Bash(npm install:*)",
       "Bash(psql:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(npx shadcn@latest add calendar popover --yes)",
+      "Bash(npm run:*)"
     ]
   },
   "enabledMcpjsonServers": [
