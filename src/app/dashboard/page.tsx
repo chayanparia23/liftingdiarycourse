@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { auth } from "@clerk/nextjs/server";
 import { format } from "date-fns";
 import { Dumbbell } from "lucide-react";
@@ -44,7 +46,7 @@ export default async function DashboardPage({
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
             Dashboard
           </h1>
-          <DatePicker date={date} />
+          <DatePicker dateStr={dateParam ?? format(new Date(), "yyyy-MM-dd")} />
         </div>
 
         {/* Workouts section */}

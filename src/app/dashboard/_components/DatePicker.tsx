@@ -12,7 +12,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-export function DatePicker({ date }: { date: Date }) {
+export function DatePicker({ dateStr }: { dateStr: string }) {
+  const date = new Date(`${dateStr}T00:00:00`);
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
@@ -31,6 +32,7 @@ export function DatePicker({ date }: { date: Date }) {
           onSelect={(d) => {
             if (d) {
               router.push(`/dashboard?date=${format(d, "yyyy-MM-dd")}`);
+              router.refresh();
               setOpen(false);
             }
           }}
