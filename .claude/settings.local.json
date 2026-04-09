@@ -5,7 +5,11 @@
       "Bash(psql:*)",
       "Bash(npx tsx:*)",
       "Bash(npx shadcn@latest add calendar popover --yes)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(npx shadcn@latest add form input label --yes)",
+      "Bash(npx shadcn@latest add form --yes)",
+      "Bash(npx shadcn@latest add form)",
+      "Bash(npx tsc:*)"
     ]
   },
   "enabledMcpjsonServers": [
