@@ -37,6 +37,27 @@ See `docs/data-fetching.md` for the full spec. Key rules:
 - **`/data` helpers only** — all DB queries go through helper functions in `src/data/`, using Drizzle ORM. No raw SQL.
 - **User scoping is mandatory** — every query helper must filter by `userId`. A user must never be able to access another user's data.
 
+## Data Mutations
+
+See `docs/data-mutations.md` for the full spec. Key rules:
+
+- **`/data` helpers only** — all DB writes go through helper functions in `src/data/`, using Drizzle ORM. No raw SQL.
+- **Server Actions only** — all mutations must be triggered via Server Actions. No route handlers or client-side fetches.
+- **Colocated `actions.ts`** — Server Actions live in an `actions.ts` file next to the `page.tsx` that uses them.
+- **No `FormData` params** — action parameters must be explicitly typed; derive types from Zod schemas with `z.infer<>`.
+- **Zod validation is mandatory** — every Server Action must validate its arguments with Zod before doing any work.
+- **User scoping is mandatory** — every mutation helper must filter by `userId`. A user must never be able to mutate another user's data.
+- **No `redirect()` in actions** — never call `redirect()` inside a Server Action; handle navigation client-side with `router.push()` after the action resolves.
+
+## Authentication
+
+See `docs/auth.md` for the full spec. Key rules:
+
+- **Clerk only** — no custom auth, NextAuth, or any other auth library.
+- **`auth()` from `@clerk/nextjs/server`** — the sole way to get the current user in Server Components.
+- **Middleware protects routes** — use `clerkMiddleware` in `middleware.ts`; do not rely on UI hiding.
+- **Pass `userId` to helpers** — Server Components obtain `userId` from `auth()` and pass it down; helpers never call `auth()` themselves.
+
 ## UI Standards
 
 See `docs/ui.md` for the full spec. Key rules:

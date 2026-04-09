@@ -36,8 +36,6 @@ export default async function DashboardPage({
   const date = dateParam ? new Date(`${dateParam}T00:00:00`) : new Date();
   const workouts = await getWorkoutsForDate(userId!, date);
 
-  const exercises = workouts.flatMap((w) => w.workoutExercises);
-
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
       <div className="mx-auto max-w-2xl px-4 py-10">
@@ -55,7 +53,7 @@ export default async function DashboardPage({
             Workouts — {format(date, "do MMM yyyy")}
           </h2>
 
-          {exercises.length === 0 ? (
+          {workouts.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-200 py-16 text-center dark:border-zinc-800">
               <Dumbbell className="mb-3 h-8 w-8 text-zinc-300 dark:text-zinc-600" />
               <p className="text-sm text-zinc-400 dark:text-zinc-500">
@@ -63,21 +61,48 @@ export default async function DashboardPage({
               </p>
             </div>
           ) : (
-            <ul className="flex flex-col gap-3">
-              {exercises.map((we) => (
+            <ul className="flex flex-col gap-4">
+              {workouts.map((workout) => (
                 <li
-                  key={we.id}
-                  className="flex items-center justify-between rounded-xl border border-zinc-200 bg-white px-5 py-4 dark:border-zinc-800 dark:bg-zinc-900"
+                  key={workout.id}
+                  className="rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
                 >
-                  <div className="flex items-center gap-3">
-                    <Dumbbell className="h-5 w-5 text-zinc-400 dark:text-zinc-500" />
-                    <span className="font-medium text-zinc-900 dark:text-zinc-50">
-                      {we.exercise.name}
+                  <div className="flex items-center justify-between px-5 py-4">
+                    <div>
+                      <p className="font-medium text-zinc-900 dark:text-zinc-50">
+                        {workout.title ?? "Untitled Workout"}
+                      </p>
+                      <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                        {format(workout.startedAt, "h:mm a")}
+                        {workout.bodyweightKg ? ` · ${workout.bodyweightKg} kg` : ""}
+                      </p>
+                    </div>
+                    <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                      {workout.workoutExercises.length === 0
+                        ? "No exercises"
+                        : `${workout.workoutExercises.length} exercise${workout.workoutExercises.length > 1 ? "s" : ""}`}
                     </span>
                   </div>
-                  <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                    {formatSetsInfo(we.sets)}
-                  </span>
+                  {workout.workoutExercises.length > 0 && (
+                    <ul className="border-t border-zinc-100 dark:border-zinc-800">
+                      {workout.workoutExercises.map((we) => (
+                        <li
+                          key={we.id}
+                          className="flex items-center justify-between px-5 py-3"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Dumbbell className="h-4 w-4 text-zinc-400 dark:text-zinc-500" />
+                            <span className="text-sm text-zinc-800 dark:text-zinc-200">
+                              {we.exercise.name}
+                            </span>
+                          </div>
+                          <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                            {formatSetsInfo(we.sets)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </li>
               ))}
             </ul>
