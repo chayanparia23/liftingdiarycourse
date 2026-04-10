@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { auth } from "@clerk/nextjs/server";
 import { format } from "date-fns";
 import { Dumbbell } from "lucide-react";
+import Link from "next/link";
 import { getWorkoutsForDate } from "@/data/workouts";
 import { DatePicker } from "./_components/DatePicker";
 import type { WorkoutSet } from "@/db/schema";
@@ -63,10 +64,11 @@ export default async function DashboardPage({
           ) : (
             <ul className="flex flex-col gap-4">
               {workouts.map((workout) => (
-                <li
-                  key={workout.id}
-                  className="rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
-                >
+                <li key={workout.id}>
+                  <Link
+                    href={`/dashboard/workout/${workout.id}`}
+                    className="block rounded-xl border border-zinc-200 bg-white transition-colors hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
+                  >
                   <div className="flex items-center justify-between px-5 py-4">
                     <div>
                       <p className="font-medium text-zinc-900 dark:text-zinc-50">
@@ -103,6 +105,7 @@ export default async function DashboardPage({
                       ))}
                     </ul>
                   )}
+                  </Link>
                 </li>
               ))}
             </ul>

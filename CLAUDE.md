@@ -58,6 +58,22 @@ See `docs/auth.md` for the full spec. Key rules:
 - **Middleware protects routes** — use `clerkMiddleware` in `middleware.ts`; do not rely on UI hiding.
 - **Pass `userId` to helpers** — Server Components obtain `userId` from `auth()` and pass it down; helpers never call `auth()` themselves.
 
+## Server Components
+
+See `docs/server-components.md` for the full spec. Key rules:
+
+- **`params` and `searchParams` must be awaited** — in Next.js 15 they are Promises; always `await` before accessing properties.
+- **Type them as `Promise<{ ... }>`** — declare the correct type so TypeScript enforces the await.
+- **Pages must be `async`** — any page or layout that reads `params`, `searchParams`, or fetches data must be an `async` function.
+
+## Routing
+
+See `docs/routing.md` for the full spec. Key rules:
+
+- **All routes under `/dashboard`** — every feature route must be nested under `/dashboard`; no top-level feature routes.
+- **Middleware protects `/dashboard`** — use `clerkMiddleware` in `middleware.ts`; only `/sign-in` and `/sign-up` are public.
+- **No route handlers for features** — use Server Components for fetching and Server Actions for mutations instead.
+
 ## UI Standards
 
 See `docs/ui.md` for the full spec. Key rules:
