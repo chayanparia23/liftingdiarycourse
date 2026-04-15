@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { format } from "date-fns";
 import { Dumbbell } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getWorkoutsForDate } from "@/data/workouts";
 import { DatePicker } from "./_components/DatePicker";
 import type { WorkoutSet } from "@/db/schema";
@@ -32,10 +33,15 @@ export default async function DashboardPage({
   searchParams: Promise<{ date?: string }>;
 }) {
   const { userId } = await auth();
+
+  if (!userId) {
+    redirect('/sign-in');
+  }
+
   const { date: dateParam } = await searchParams;
 
   const date = dateParam ? new Date(`${dateParam}T00:00:00`) : new Date();
-  const workouts = await getWorkoutsForDate(userId!, date);
+  const workouts = await getWorkoutsForDate(userId, date);
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
