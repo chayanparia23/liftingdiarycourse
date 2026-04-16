@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider, SignInButton, SignUpButton, Show, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeToggle } from "@/components/theme-toggle";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,26 +27,36 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ClerkProvider>
-          <header>
-            <Show when="signed-out">
-              <SignInButton mode="modal">
-                <Button variant="outline">Sign In</Button>
-              </SignInButton>
-              <SignUpButton mode="modal">
-                <Button>Sign Up</Button>
-              </SignUpButton>
-            </Show>
-            <Show when="signed-in">
-              <UserButton />
-            </Show>
-          </header>
-          {children}
-        </ClerkProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ClerkProvider>
+            <header className="flex items-center justify-between px-6 py-3 border-b">
+              <div className="flex items-center gap-2">
+                <Show when="signed-out">
+                  <SignInButton mode="modal">
+                    <Button variant="outline">Sign In</Button>
+                  </SignInButton>
+                  <SignUpButton mode="modal">
+                    <Button>Sign Up</Button>
+                  </SignUpButton>
+                </Show>
+                <Show when="signed-in">
+                  <UserButton />
+                </Show>
+              </div>
+              <ThemeToggle />
+            </header>
+            {children}
+          </ClerkProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
