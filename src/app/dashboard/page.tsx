@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { Dumbbell } from "lucide-react";
 import Link from "next/link";
 import { getWorkoutsForDate } from "@/data/workouts";
+import { buttonVariants } from "@/components/ui/button";
 import { DatePicker } from "./_components/DatePicker";
 import type { WorkoutSet } from "@/db/schema";
 
@@ -45,7 +46,12 @@ export default async function DashboardPage({
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
             Dashboard
           </h1>
-          <DatePicker dateStr={dateParam ?? format(new Date(), "yyyy-MM-dd")} />
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard/workout/new" className={buttonVariants()}>
+              Log new workout
+            </Link>
+            <DatePicker dateStr={dateParam ?? format(new Date(), "yyyy-MM-dd")} />
+          </div>
         </div>
 
         {/* Workouts section */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
@@ -16,6 +16,20 @@ export function DatePicker({ dateStr }: { dateStr: string }) {
   const date = new Date(`${dateStr}T00:00:00`);
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <button className={buttonVariants({ variant: "outline" }) + " gap-2"}>
+        <CalendarIcon className="h-4 w-4 text-zinc-500" />
+        {format(date, "do MMM yyyy")}
+      </button>
+    );
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
