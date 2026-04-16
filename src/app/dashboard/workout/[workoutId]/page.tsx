@@ -1,8 +1,10 @@
 import { auth } from '@clerk/nextjs/server'
 import { notFound, redirect } from 'next/navigation'
 import { format } from 'date-fns'
-import { getWorkoutById } from '@/data/workouts'
+import { getWorkoutWithExercises } from '@/data/workoutExercises'
+import { getExercises } from '@/data/exercises'
 import { EditWorkoutForm } from './_components/EditWorkoutForm'
+import { ExerciseLogger } from './_components/ExerciseLogger'
 
 interface EditWorkoutPageProps {
   params: Promise<{ workoutId: string }>
@@ -16,7 +18,10 @@ export default async function EditWorkoutPage({ params }: EditWorkoutPageProps) 
   }
 
   const { workoutId } = await params
-  const workout = await getWorkoutById(userId, workoutId)
+  const [workout, availableExercises] = await Promise.all([
+    getWorkoutWithExercises(userId, workoutId),
+    getExercises(userId),
+  ])
 
   if (!workout) {
     notFound()
@@ -30,7 +35,7 @@ export default async function EditWorkoutPage({ params }: EditWorkoutPageProps) 
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      <div className="mx-auto max-w-lg px-4 py-10">
+      <div className="mx-auto max-w-2xl px-4 py-10">
         <div className="mb-8">
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
             Edit Workout
@@ -42,6 +47,14 @@ export default async function EditWorkoutPage({ params }: EditWorkoutPageProps) 
 
         <div className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
           <EditWorkoutForm workoutId={workoutId} defaultValues={defaultValues} />
+        </div>
+
+        <div className="mt-10">
+          <ExerciseLogger
+            workoutId={workoutId}
+            workoutExercises={workout.workoutExercises}
+            availableExercises={availableExercises}
+          />
         </div>
       </div>
     </div>
